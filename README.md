@@ -70,6 +70,10 @@ To skip the scripts completely, `create-project` can be run with `--no-scripts` 
 4. Add theme(s)
 5. Access WP Admin at `http://example.com/wp/wp-admin`
 
+#### Web Server setup
+
+Beyond the usual PHP setup in either Nginx or Apache, the only Bedrock specific configuration needed for a virtual site is to make the web/document root `/path/to/site/web`.
+
 Using Capistrano for deploys?
 
 ### Deploying with Capistrano
@@ -128,6 +132,7 @@ The organization of Bedrock is similar to putting WordPress in its own subdirect
 * Capistrano configs are also located in `config/` to make it consistent.
 * `vendor/` is where the Composer managed dependencies are installed to.
 * `wp/` is where the WordPress core lives. It's also managed by Composer but can't be put under `vendor` due to WP limitations.
+* The WP core and your app files live under web/ for better separation and security. This becomes your webroot so nothing outside of it is accessible.
 
 ### Configuration Files
 
@@ -143,36 +148,6 @@ Note: You can't re-define constants in PHP. So if you have a base setting in `ap
 
 * Remove the base option and be sure to define it in every environment it's needed
 * Only define the constant in `application.php` if it isn't already defined.
-
-**Security warning**: You'll want to block configuration files from being publicly accessible (we'll do this automatically once we have Vagrant/server configs)
-
-Nginx:
-
-```nginx
-location ~ /(config|Capfile|Gemfile(\.lock)?|composer(\.lock|\.json)|\.env) {
-  deny all;
-}
-```
-
-Apache (in `.htaccess`):
-
-```apache
-<FilesMatch "/(config|Capfile|Gemfile(\.lock)?|composer(\.lock|\.json)|\.env)">
-
-    # Apache < 2.3
-    <IfModule !mod_authz_core.c>
-        Order allow,deny
-        Deny from all
-        Satisfy All
-    </IfModule>
-
-    # Apache ≥ 2.3
-    <IfModule mod_authz_core.c>
-        Require all denied
-    </IfModule>
-
-</FilesMatch>
-```
 
 #### Don't want it?
 
